@@ -133,3 +133,93 @@ function render() {
   document.getElementById('timeText').textContent = Math.ceil(timeLeft);
   document.getElementById('scoreText').textContent = score;
 }
+function update(dt) {
+  // Decrementa tempo
+  timeLeft -= dt;
+  if (timeLeft <= 0) {
+    endGame();
+    return;
+  }
+
+  // Move and remove elements
+  elements = elements.filter(el => {
+    el.y -= FALL_SPEED * dt;
+    return el.y + 32 > 0; // mantieni se non oltre bordo superiore
+  });
+
+  // Spawning con probabilità
+  if (Math.random() < 0.3 * dt) {
+    spawnElement();
+  }
+
+  // Muovi il giocatore (controlli settati da setupControls)
+  // player.vx impostata da eventi touch
+  player.x += (player.vx || 0) * dt;
+  // Limita ai bordi
+  player.x = Math.max(0, Math.min(screenWidth, player.x));
+
+  // Controlla collisioni
+  elements.forEach(el => {
+    if (isColliding(player, el)) handleCollision(el);
+  });
+}
+
+// Funzione di spawning
+function spawnElement() {
+  const rand = Math.random() * 100;
+  let acc = 0;
+  for (const type of ELEMENT_TYPES) {
+    acc += type.probability;
+    if (rand <= acc) {
+      elements.push({
+        type: type.type,
+        icon: type.icon,
+        x: Math.random() * screenWidth,
+        y: screenHeight + 32,
+      });
+      break;
+    }
+  }
+}
+
+// Rilevamento collisioni (AABB semplificato)
+function isColliding(player, el) {
+  const size = 32;
+  return Math.abs(player.x - el.x) < size && Math.abs(player.y - el.y) < size;
+}
+
+// Gestione fine partita
+function endGame() {
+  gameState = 'GAMEOVER';
+  document.getElementById('titleScreen').style.display = 'flex';
+  lastScore = score;
+  bestScore = Math.max(bestScore, score);
+  localStorage.setItem(LS_LAST_SCORE, lastScore);
+  localStorage.setItem(LS_BEST_SCORE, bestScore);
+  document.getElementById('lastScore').textContent = lastScore;
+  document.getElementById('bestScore').textContent = bestScore;
+}
+// Funzione di rendering
+function render() {
+  // Pulisce il canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Disegna elemento guidato
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(selectedEmoji, player.x, player.y);
+
+  // Disegna elementi cadenti
+  ctx.font = '32px sans-serif';
+  elements.forEach(el => {
+    ctx.fillText(el.icon, el.x, el.y);
+  });
+
+  // Disegna HUD
+  // Barra del tempo
+  const timePct = timeLeft / GAME_DURATION;
+  document.getElementById('timeBar').style.width = (timePct * 100) + '%';
+  // Testo tempo e punteggio
+  document.getElementById('timeText').textContent = Math.ceil(timeLeft);
+  document.getElementById('scoreText').textContent = score;
+}
