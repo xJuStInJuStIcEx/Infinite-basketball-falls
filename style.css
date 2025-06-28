@@ -87,7 +87,7 @@ html, body {
   bottom: 5vh;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
+  display: none !important;    /* Nascosto di default con !important */
   gap: 5vw;
   z-index: 5;
 }
