@@ -1,59 +1,51 @@
 // Costanti emoji e probabilità
 const EMOJI_LIST = ['🏀','⚽️','⚾️','🥎','🏈','🏉','🏐','🎱','🧿','🪩','🧶','🥏','🐡','🎃'];
 const ELEMENT_TYPES = [
-  { type: 'basket',      icon: '🗑', probability: 30 },
-  { type: 'brick',       icon: '🧱', probability: 20 },
-  { type: 'sword',       icon: '⚔️', probability: 10 },
-  { type: 'snail',       icon: '🐌', probability: 20 },
-  { type: 'battery',     icon: '🔋', probability: 20 },
-  { type: 'magnet',      icon: '🧲', probability: 15 },
-  { type: 'timeBonus',   icon: '🕑', probability: 15 }
+  { type: 'basket',    icon: '🗑', probability: 30 },
+  { type: 'brick',     icon: '🧱', probability: 20 },
+  { type: 'sword',     icon: '⚔️', probability: 10 },
+  { type: 'snail',     icon: '🐌', probability: 20 },
+  { type: 'battery',   icon: '🔋', probability: 20 },
+  { type: 'magnet',    icon: '🧲', probability: 15 },
+  { type: 'timeBonus', icon: '🕑', probability: 15 }
 ];
 
 // Parametri di gioco
-const GAME_DURATION    = 180;   // secondi totali
-const FALL_SPEED       = 100;   // pixel al secondo
-const SIDE_SPEED       = 200;   // pixel al secondo (base)
+const GAME_DURATION    = 180;
+const FALL_SPEED       = 100;
+const SIDE_SPEED       = 200;
 
-// Durata effetti (in secondi)
-const EFFECT_DURATIONS = {
-  bounceDisable: 3,
-  slow:          10,
-  fast:          10,
-  magnetUses:    5
-};
+// Durata effetti
+const EFFECT_DURATIONS = { bounceDisable: 3, slow: 10, fast: 10, magnetUses: 5 };
 
 // LocalStorage keys
 const LS_BEST_SCORE = 'bestScore';
 const LS_LAST_SCORE = 'lastScore';
 
-// Stato e variabili globali
+// Stato globale
 let canvas, ctx;
 let screenWidth, screenHeight;
-let gameState     = 'TITLE'; // TITLE, PLAYING, GAMEOVER
+let gameState     = 'TITLE';
 let selectedEmoji = EMOJI_LIST[0];
 let bestScore     = 0;
 let lastScore     = 0;
 
-// Variabili di runtime
+// Runtime
 let player = {};
 let elements = [];
 let timeLeft = GAME_DURATION;
 let score    = 0;
 let lastTimestamp = 0;
 
-// Inizializzazione al caricamento DOM
-document.addEventListener('DOMContentLoaded', init);
+// Inizializza al caricamento del DOM
+window.addEventListener('DOMContentLoaded', init);
 
 function init() {
-  // Canvas setup
+  // Setup canvas
   canvas = document.getElementById('gameCanvas');
   ctx    = canvas.getContext('2d');
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
-
-  // Nascondi controlli
-  document.getElementById('controls').style.visibility = 'hidden';
 
   // Carica punteggi
   bestScore = parseInt(localStorage.getItem(LS_BEST_SCORE)) || 0;
@@ -61,24 +53,31 @@ function init() {
   document.getElementById('bestScore').textContent = bestScore;
   document.getElementById('lastScore').textContent = lastScore;
 
-  // Selettore emoji → avvio immediato
+  // Assicurati che i controlli siano nascosti
+  document.getElementById('controls').style.display = 'none';
+
+  // Imposta listener sulle emoji: seleziona e avvia
   document.querySelectorAll('.emoji-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      // Evidenzia selezione
+      // Segna selezione
       document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       selectedEmoji = btn.textContent;
-      // Nascondi overlay e mostra controlli
+
+      // Nascondi overlay titolo
       document.getElementById('titleScreen').style.display = 'none';
-      document.getElementById('controls').style.visibility = 'visible';
+      // Mostra controlli
+      document.getElementById('controls').style.display = 'flex';
+
+      // Avvia la partita
       startGame();
     });
   });
 
-  // Setup controlli touch
+  // Setup touch controls
   setupControls();
 
-  // Avvia loop
+  // Avvia il loop di gioco
   requestAnimationFrame(loop);
 }
 
@@ -115,15 +114,15 @@ function startGame() {
     magnetUses: 0,
     controlsDisabled: false
   };
-  document.getElementById('controls').style.display = 'flex';
 }
 
 function endGame() {
   gameState = 'GAMEOVER';
-  // Torna a titolo
-  document.getElementById('titleScreen').style.display    = 'flex';
-  document.getElementById('controls').style.display = 'none';
+  // Mostra titolo e nascondi controlli
+  document.getElementById('titleScreen').style.display = 'flex';
+  document.getElementById('controls').style.display    = 'none';
 
+  // Salva punteggi
   lastScore = score;
   bestScore = Math.max(bestScore, score);
   localStorage.setItem(LS_LAST_SCORE, lastScore);
@@ -140,23 +139,19 @@ function update(dt) {
     return;
   }
 
-  // Spawn elementi
-  if (Math.random() < 0.3 * dt) {
-    spawnElement();
-  }
+  // Spawn
+  if (Math.random() < 0.3 * dt) spawnElement();
 
-  // Muovi e filtra
+  // Muovi e filtra elementi
   elements = elements.filter(el => {
     el.y -= FALL_SPEED * dt;
     return el.y + 32 > 0;
   });
 
-  // Magnet effect
-  if (player.magnetUses > 0) {
-    applyMagnet();
-  }
+  // Magnet
+  if (player.magnetUses > 0) applyMagnet();
 
-  // Muovi player (se non disabilitato)
+  // Movimento orizzontale
   if (!player.controlsDisabled) {
     player.x += (player.vx || 0) * dt;
     player.x = Math.max(0, Math.min(screenWidth, player.x));
@@ -164,17 +159,14 @@ function update(dt) {
 
   // Collisioni
   elements.forEach(el => {
-    if (isColliding(player, el)) {
-      handleCollision(el);
-    }
+    if (isColliding(player, el)) handleCollision(el);
   });
 }
 
 function render() {
-  // Pulisce canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Disegna player
+  // Disegna emoji giocatore
   ctx.font = '48px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(selectedEmoji, player.x, player.y);
@@ -185,7 +177,7 @@ function render() {
     ctx.fillText(el.icon, el.x, el.y);
   });
 
-  // HUD: barra tempo e testi
+  // HUD
   const timePct = timeLeft / GAME_DURATION;
   document.getElementById('timeBar').style.width = `${timePct * 100}%`;
   document.getElementById('timeText').textContent  = Math.ceil(timeLeft);
@@ -238,11 +230,11 @@ function handleCollision(el) {
       break;
     case 'snail':
       player.sideSpeed /= 2;
-      setTimeout(() => { player.sideSpeed = SIDE_SPEED; }, EFFECT_DURATIONS.slow * 1000);
+      setTimeout(() => player.sideSpeed = SIDE_SPEED, EFFECT_DURATIONS.slow * 1000);
       break;
     case 'battery':
       player.sideSpeed *= 1.5;
-      setTimeout(() => { player.sideSpeed = SIDE_SPEED; }, EFFECT_DURATIONS.fast * 1000);
+      setTimeout(() => player.sideSpeed = SIDE_SPEED, EFFECT_DURATIONS.fast * 1000);
       break;
     case 'magnet':
       player.magnetUses = EFFECT_DURATIONS.magnetUses;
