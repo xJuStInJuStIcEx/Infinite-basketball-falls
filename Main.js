@@ -109,3 +109,27 @@ function startGame() {
   elements = [];
   player = { x: screenWidth / 2, y: screenHeight / 4, sideSpeed: SIDE_SPEED };
 }
+// Funzione di rendering
+function render() {
+  // Pulisce il canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Disegna elemento guidato
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(selectedEmoji, player.x, player.y);
+
+  // Disegna elementi cadenti
+  ctx.font = '32px sans-serif';
+  elements.forEach(el => {
+    ctx.fillText(el.icon, el.x, el.y);
+  });
+
+  // Disegna HUD
+  // Barra del tempo
+  const timePct = timeLeft / GAME_DURATION;
+  document.getElementById('timeBar').style.width = (timePct * 100) + '%';
+  // Testo tempo e punteggio
+  document.getElementById('timeText').textContent = Math.ceil(timeLeft);
+  document.getElementById('scoreText').textContent = score;
+}
