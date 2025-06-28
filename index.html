@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Caduta Emoji</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- SCHERMATA TITOLO -->
+  <div id="titleScreen" class="overlay">
+    <h1>Caduta Emoji</h1>
+    <div class="scores">
+      <div>Best Score: <span id="bestScore">0</span></div>
+      <div>Last Score: <span id="lastScore">0</span></div>
+    </div>
+    <div class="selector">
+      <p>Seleziona oggetto:</p>
+      <div id="emojiChooser">
+        <!-- Emoji inserite via JS o manualmente -->
+        <button class="emoji-btn">🏀</button>
+        <button class="emoji-btn">⚽️</button>
+        <button class="emoji-btn">⚾️</button>
+        <button class="emoji-btn">🥎</button>
+        <button class="emoji-btn">🏈</button>
+        <button class="emoji-btn">🏉</button>
+        <button class="emoji-btn">🏐</button>
+        <button class="emoji-btn">🎱</button>
+        <button class="emoji-btn">🧿</button>
+        <button class="emoji-btn">🪩</button>
+        <button class="emoji-btn">🧶</button>
+        <button class="emoji-btn">🥏</button>
+        <button class="emoji-btn">🐡</button>
+        <button class="emoji-btn">🎃</button>
+      </div>
+    </div>
+    <button id="startBtn" class="large-btn">Avvia Partita</button>
+  </div>
+
+  <!-- CANVAS DI GIOCO -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- CONTROLLI TOUCH -->
+  <div id="controls">
+    <button id="leftBtn" class="control-btn">⏪️</button>
+    <button id="rightBtn" class="control-btn">⏩️</button>
+  </div>
+
+  <!-- BARRA E INDICATORI -->
+  <div id="hud">
+    <div id="timeBarContainer">
+      <div id="timeBar"></div>
+    </div>
+    <div id="timeText">180</div>
+    <div id="scoreText">0</div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>
