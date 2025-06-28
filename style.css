@@ -59,12 +59,30 @@ html, body {
 }
 
 .emoji-btn {
+  display: inline-block;        /* Assicura dimensioni e posizionamento */
+  position: relative;           /* Necessario per il pseudo-elemento */
   font-size: 2em;
   background: transparent;
   border: 2px solid #fff;
   border-radius: 0.25em;
   padding: 0.25em;
   cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+/* Stato selezionato */
+.emoji-btn.selected {
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
+}
+
+/* Aggiunge ✔️ in alto a destra */
+.emoji-btn.selected::after {
+  content: '✔️';
+  position: absolute;
+  top: -0.3em;
+  right: -0.3em;
+  font-size: 0.75em;
 }
 
 .large-btn {
