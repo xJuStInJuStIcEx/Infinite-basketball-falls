@@ -70,21 +70,6 @@ html, body {
   transition: box-shadow 0.2s, border-color 0.2s;
 }
 
-/* Stato selezionato */
-.emoji-btn.selected {
-  border-color: #ffc107 !important;
-  box-shadow: 0 0 10px rgba(255, 193, 7, 0.8);
-}
-
-/* Aggiunge ✔️ in alto a destra */
-.emoji-btn.selected::after {
-  content: '✔️';
-  position: absolute;
-  top: -0.3em;
-  right: -0.3em;
-  font-size: 0.75em;
-}
-
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
@@ -151,22 +136,55 @@ html, body {
 #timeText, #scoreText {
   font-size: 1.2em;
 }
-/* Mantieni la posizione relativa per il pseudo-elemento */
+
+/* ============================= */
+/* Selettore Emoji – Stile Rifatto */
+/* ============================= */
+
+/* Base */
 .emoji-btn {
-  position: relative;
+  display: inline-flex;         /* elemento flessibile */
+  align-items: center;
+  justify-content: center;
+  position: relative;           /* necessario per ::after */
+  width: 3em;                   /* larghezza fissa */
+  height: 3em;                  /* altezza fissa */
+  font-size: 2em;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.5);
+  border-radius: 0.5em;
+  margin: 0.25em;
+  padding: 0;
+  cursor: pointer;
+  transition: 
+    background 0.2s, 
+    border-color 0.2s, 
+    box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
-/* Stile per emoji selezionata */
+/* Hover/focus per feedback rapido */
+.emoji-btn:hover,
+.emoji-btn:focus {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Stato selezionato */
 .emoji-btn.selected {
-  border-color: #ffc107;
-  box-shadow: 0 0 8px rgba(255, 193, 7, 0.7);
+  background: rgba(255,193,7,0.3) !important;       /* giallo trasparente */
+  border-color: #ffc107 !important;                  /* giallo pieno */
+  box-shadow: 0 0 8px rgba(255,193,7,0.8) !important;
 }
 
-/* Aggiunge ✔️ in alto a destra */
+/* Spunta in alto a destra */
 .emoji-btn.selected::after {
   content: '✔️';
   position: absolute;
-  top: -0.25em;
-  right: -0.25em;
+  top: -0.4em;
+  right: -0.4em;
   font-size: 0.75em;
+  background: #fff;
+  border-radius: 50%;
 }
+
+/* ============================= */
