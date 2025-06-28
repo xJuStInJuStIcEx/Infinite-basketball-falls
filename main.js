@@ -102,32 +102,32 @@ function loop(timestamp) {
 }
 
 function startGame() {
-  // Imposta lo stato di gioco
+  // Aggiungi la classe playing al body
+  document.body.classList.add('playing');
+
   gameState = 'PLAYING';
-  // Reset timer e punteggio
   timeLeft  = GAME_DURATION;
   score     = 0;
   elements  = [];
-  // Reset player
   player    = {
-    x: screenWidth / 2,
-    y: screenHeight / 4,
+    x: screenWidth/2,
+    y: screenHeight/4,
     sideSpeed: SIDE_SPEED,
     vx: 0,
     magnetUses: 0,
     controlsDisabled: false
   };
-  // Fissiamo lastTimestamp per il loop
+  // reset del timestamp per evitare dt gigante
   lastTimestamp = performance.now();
-  // Mostra i controlli
-  document.getElementById('controls').style.display = 'flex';
 }
 
 function endGame() {
   gameState = 'GAMEOVER';
-  // Mostra titolo e nascondi controlli
+  // Rimuovi la classe playing per nascondere i controlli
+  document.body.classList.remove('playing');
+
+  // Mostra di nuovo il titolo
   document.getElementById('titleScreen').style.display = 'flex';
-  document.getElementById('controls').style.display    = 'none';
 
   // Salva punteggi
   lastScore = score;
