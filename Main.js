@@ -40,3 +40,72 @@ let elements = [];
 let timeLeft = GAME_DURATION;
 let score = 0;
 let lastTimestamp = 0;
+// Funzione di inizializzazione
+function init() {
+  // Canvas setup
+  canvas = document.getElementById('gameCanvas');
+  ctx = canvas.getContext('2d');
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // Carica punteggi da localStorage
+  bestScore = parseInt(localStorage.getItem(LS_BEST_SCORE)) || 0;
+  lastScore = parseInt(localStorage.getItem(LS_LAST_SCORE)) || 0;
+  document.getElementById('bestScore').textContent = bestScore;
+  document.getElementById('lastScore').textContent = lastScore;
+
+  // Setup selettore emoji
+  document.querySelectorAll('.emoji-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedEmoji = btn.textContent;
+    });
+  });
+
+  // Pulsante avvia partita
+  document.getElementById('startBtn').addEventListener('click', () => startGame());
+
+  // Controlli touch
+  setupControls();
+
+  // Avvia loop titolo
+  requestAnimationFrame(loop);
+}
+
+// Ridimensiona il canvas al 16:9 verticale centrato
+function resizeCanvas() {
+  screenWidth = window.innerWidth;
+  screenHeight = window.innerWidth * 16 / 9;
+  canvas.width = screenWidth;
+  canvas.height = screenHeight;
+  canvas.style.height = screenHeight + 'px';
+}
+
+// Loop principale (gestisce rendering e update in TITLE mostriamo schermo)
+function loop(timestamp) {
+  const dt = (timestamp - lastTimestamp) / 1000;
+  lastTimestamp = timestamp;
+
+  if (gameState === 'TITLE') {
+    // Mostra solo schermata titolo
+    // (render in overlay con HTML/CSS)
+  }
+
+  if (gameState === 'PLAYING') {
+    update(dt);
+    render();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+// Avvia la partita
+function startGame() {
+  document.getElementById('titleScreen').style.display = 'none';
+  gameState = 'PLAYING';
+  timeLeft = GAME_DURATION;
+  score = 0;
+  elements = [];
+  player = { x: screenWidth / 2, y: screenHeight / 4, sideSpeed: SIDE_SPEED };
+}
