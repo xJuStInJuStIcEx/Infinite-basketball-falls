@@ -56,15 +56,17 @@ function init() {
 
   // Setup selettore emoji
   document.querySelectorAll('.emoji-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedEmoji = btn.textContent;
-    });
+  btn.addEventListener('click', () => {
+    // Evidenzia la selezione
+    document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    // Imposta emoji scelta
+    selectedEmoji = btn.textContent;
+    // Avvia subito la partita
+    document.getElementById('titleScreen').style.display = 'none';
+    startGame();
   });
-
-  // Pulsante avvia partita
-  document.getElementById('startBtn').addEventListener('click', () => startGame());
+});
 
   // Controlli touch
   setupControls();
