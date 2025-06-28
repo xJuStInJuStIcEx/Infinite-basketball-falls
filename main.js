@@ -115,14 +115,14 @@ function startGame() {
     magnetUses: 0,
     controlsDisabled: false
   };
-  document.getElementById('controls').style.visibility = 'visible';
+  document.getElementById('controls').style.display = 'flex';
 }
 
 function endGame() {
   gameState = 'GAMEOVER';
   // Torna a titolo
   document.getElementById('titleScreen').style.display    = 'flex';
-  document.getElementById('controls').style.visibility = 'hidden';
+  document.getElementById('controls').style.display = 'none';
 
   lastScore = score;
   bestScore = Math.max(bestScore, score);
