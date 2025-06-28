@@ -187,4 +187,9 @@ html, body {
   border-radius: 50%;
 }
 
+/* Nascondi controlli nella schermata di avvio
+#controls {
+  display: none;
+}
+
 /* ============================= */
