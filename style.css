@@ -133,3 +133,22 @@ html, body {
 #timeText, #scoreText {
   font-size: 1.2em;
 }
+/* Mantieni la posizione relativa per il pseudo-elemento */
+.emoji-btn {
+  position: relative;
+}
+
+/* Stile per emoji selezionata */
+.emoji-btn.selected {
+  border-color: #ffc107;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.7);
+}
+
+/* Aggiunge ✔️ in alto a destra */
+.emoji-btn.selected::after {
+  content: '✔️';
+  position: absolute;
+  top: -0.25em;
+  right: -0.25em;
+  font-size: 0.75em;
+}
