@@ -102,10 +102,13 @@ function loop(timestamp) {
 }
 
 function startGame() {
+  // Imposta lo stato di gioco
   gameState = 'PLAYING';
+  // Reset timer e punteggio
   timeLeft  = GAME_DURATION;
   score     = 0;
   elements  = [];
+  // Reset player
   player    = {
     x: screenWidth / 2,
     y: screenHeight / 4,
@@ -114,6 +117,10 @@ function startGame() {
     magnetUses: 0,
     controlsDisabled: false
   };
+  // Fissiamo lastTimestamp per il loop
+  lastTimestamp = performance.now();
+  // Mostra i controlli
+  document.getElementById('controls').style.display = 'flex';
 }
 
 function endGame() {
