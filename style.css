@@ -82,14 +82,20 @@ html, body {
 }
 
 /* Controlli touch in basso */
+/* Controlli touch di default nascosti */
 #controls {
   position: absolute;
   bottom: 5vh;
   left: 50%;
   transform: translateX(-50%);
-  display: none;    /* Nascosto di default con !important */
+  display: none;
   gap: 5vw;
   z-index: 5;
+}
+
+/* Quando il body ha classe “playing”, mostra i controlli */
+body.playing #controls {
+  display: flex !important;
 }
 
 .control-btn {
