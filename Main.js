@@ -325,3 +325,162 @@ function render() {
   document.getElementById('timeText').textContent = Math.ceil(timeLeft);
   document.getElementById('scoreText').textContent = score;
 }
+// All'interno di update(dt), già decrementiamo timeLeft e aggiorniamo score.
+// Qui eventuale logica aggiuntiva per bonus magnet:
+
+function applyMagnet(el) {
+  // Sposta i cesti verso il player quando el.type=='magnet'
+  elements.forEach(item => {
+    if (item.type === 'basket' && player.magnetUses > 0) {
+      // Leggero spostamento orizzontale verso player
+      const dir = player.x > item.x ? 1 : -1;
+      item.x += dir * (player.sideSpeed / 2) * (1/60);
+    }
+  });
+  if (player.magnetUses > 0) player.magnetUses--;
+}
+function handleCollision(el) {
+  switch (el.type) {
+    case 'basket':
+      score += 10;
+      break;
+    case 'brick':
+      // Rimbalzo: disabilita movimenti per EFFECT_DURATIONS.bounceDisable
+      player.vx = 0;
+      disableControls(EFFECT_DURATIONS.bounceDisable);
+      break;
+    case 'sword':
+      // Fine partita immediata
+      timeLeft = 0;
+      break;
+    case 'snail':
+      // Diminuisci velocità laterale per slow
+      player.sideSpeed /= 2;
+      setTimeout(() => { player.sideSpeed = SIDE_SPEED; }, EFFECT_DURATIONS.slow * 1000);
+      break;
+    case 'battery':
+      // Aumenta velocità laterale
+      player.sideSpeed *= 1.5;
+      setTimeout(() => { player.sideSpeed = SIDE_SPEED; }, EFFECT_DURATIONS.fast * 1000);
+      break;
+    case 'magnet':
+      // I cesti si muovono verso giocatore (gestito in update)
+      player.magnetUses = EFFECT_DURATIONS.magnetUses;
+      break;
+    case 'timeBonus':
+      // Aggiungi tempo
+      timeLeft += 10;
+      if (timeLeft > GAME_DURATION) timeLeft = GAME_DURATION;
+      break;
+  }
+  // Rimuovi l'elemento dopo collisione
+  elements = elements.filter(e => e !== el);
+}
+
+// Disabilita controlli per un tempo
+function disableControls(sec) {
+  player.controlsDisabled = true;
+  setTimeout(() => { player.controlsDisabled = false; }, sec * 1000);
+}
+function setupControls() {
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+
+  leftBtn.addEventListener('touchstart', () => { player.vx = -player.sideSpeed; });
+  leftBtn.addEventListener('touchend', () => { player.vx = 0; });
+  rightBtn.addEventListener('touchstart', () => { player.vx = player.sideSpeed; });
+  rightBtn.addEventListener('touchend', () => { player.vx = 0; });
+}
+
+// Avvia tutto
+window.onload = init;
+function update(dt) {
+  // Decrementa tempo
+  timeLeft -= dt;
+  if (timeLeft <= 0) {
+    endGame();
+    return;
+  }
+
+  // Move and remove elements
+  elements = elements.filter(el => {
+    el.y -= FALL_SPEED * dt;
+    return el.y + 32 > 0; // mantieni se non oltre bordo superiore
+  });
+
+  // Spawning con probabilità
+  if (Math.random() < 0.3 * dt) {
+    spawnElement();
+  }
+
+  // Muovi il giocatore (controlli settati da setupControls)
+  // player.vx impostata da eventi touch
+  player.x += (player.vx || 0) * dt;
+  // Limita ai bordi
+  player.x = Math.max(0, Math.min(screenWidth, player.x));
+
+  // Controlla collisioni
+  elements.forEach(el => {
+    if (isColliding(player, el)) handleCollision(el);
+  });
+}
+
+// Funzione di spawning
+function spawnElement() {
+  const rand = Math.random() * 100;
+  let acc = 0;
+  for (const type of ELEMENT_TYPES) {
+    acc += type.probability;
+    if (rand <= acc) {
+      elements.push({
+        type: type.type,
+        icon: type.icon,
+        x: Math.random() * screenWidth,
+        y: screenHeight + 32,
+      });
+      break;
+    }
+  }
+}
+
+// Rilevamento collisioni (AABB semplificato)
+function isColliding(player, el) {
+  const size = 32;
+  return Math.abs(player.x - el.x) < size && Math.abs(player.y - el.y) < size;
+}
+
+// Gestione fine partita
+function endGame() {
+  gameState = 'GAMEOVER';
+  document.getElementById('titleScreen').style.display = 'flex';
+  lastScore = score;
+  bestScore = Math.max(bestScore, score);
+  localStorage.setItem(LS_LAST_SCORE, lastScore);
+  localStorage.setItem(LS_BEST_SCORE, bestScore);
+  document.getElementById('lastScore').textContent = lastScore;
+  document.getElementById('bestScore').textContent = bestScore;
+}
+// Funzione di rendering
+function render() {
+  // Pulisce il canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Disegna elemento guidato
+  ctx.font = '48px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(selectedEmoji, player.x, player.y);
+
+  // Disegna elementi cadenti
+  ctx.font = '32px sans-serif';
+  elements.forEach(el => {
+    ctx.fillText(el.icon, el.x, el.y);
+  });
+
+  // Disegna HUD
+  // Barra del tempo
+  const timePct = timeLeft / GAME_DURATION;
+  document.getElementById('timeBar').style.width = (timePct * 100) + '%';
+  // Testo tempo e punteggio
+  document.getElementById('timeText').textContent = Math.ceil(timeLeft);
+  document.getElementById('scoreText').textContent = score;
+}
