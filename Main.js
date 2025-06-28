@@ -484,3 +484,19 @@ function render() {
   document.getElementById('timeText').textContent = Math.ceil(timeLeft);
   document.getElementById('scoreText').textContent = score;
 }
+// Salva punteggi (già chiamato in endGame)
+function saveScores() {
+  localStorage.setItem(LS_LAST_SCORE, lastScore);
+  localStorage.setItem(LS_BEST_SCORE, bestScore);
+}
+
+// Reset scores (facoltativo, per debug)
+function resetScores() {
+  localStorage.removeItem(LS_LAST_SCORE);
+  localStorage.removeItem(LS_BEST_SCORE);
+  document.getElementById('lastScore').textContent = 0;
+  document.getElementById('bestScore').textContent = 0;
+}
+
+// Chiamata in endGame
+// saveScores(); // se vuoi separare la logica
