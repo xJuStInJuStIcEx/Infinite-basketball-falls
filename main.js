@@ -104,12 +104,20 @@ function loop(timestamp) {
 
 // Avvia la partita
 function startGame() {
+  // Nascondi titolo
   document.getElementById('titleScreen').style.display = 'none';
+  // Mostra i controlli touch
+  document.getElementById('controls').style.display = 'flex';
+  
   gameState = 'PLAYING';
   timeLeft = GAME_DURATION;
   score = 0;
   elements = [];
-  player = { x: screenWidth / 2, y: screenHeight / 4, sideSpeed: SIDE_SPEED };
+  player = {
+    x: screenWidth / 2,
+    y: screenHeight / 4,
+    sideSpeed: SIDE_SPEED
+  };
 }
 // Funzione di rendering
 function render() {
@@ -193,7 +201,20 @@ function isColliding(player, el) {
 // Gestione fine partita
 function endGame() {
   gameState = 'GAMEOVER';
+  // Mostra titolo
   document.getElementById('titleScreen').style.display = 'flex';
+  // Nascondi i controlli touch
+  document.getElementById('controls').style.display = 'none';
+
+  lastScore = score;
+  bestScore = Math.max(bestScore, score);
+  localStorage.setItem(LS_LAST_SCORE, lastScore);
+  localStorage.setItem(LS_BEST_SCORE, bestScore);
+  document.getElementById('lastScore').textContent = lastScore;
+  document.getElementById('bestScore').textContent = bestScore;
+}
+  gameState = 'GAMEOVER';
+  document.getElementById('titleScreen').style.display = 'none';
   lastScore = score;
   bestScore = Math.max(bestScore, score);
   localStorage.setItem(LS_LAST_SCORE, lastScore);
@@ -295,7 +316,11 @@ function isColliding(player, el) {
 // Gestione fine partita
 function endGame() {
   gameState = 'GAMEOVER';
+  // Mostra titolo
   document.getElementById('titleScreen').style.display = 'flex';
+  // Nascondi i controlli touch
+  document.getElementById('controls').style.display = 'none';
+
   lastScore = score;
   bestScore = Math.max(bestScore, score);
   localStorage.setItem(LS_LAST_SCORE, lastScore);
@@ -454,7 +479,11 @@ function isColliding(player, el) {
 // Gestione fine partita
 function endGame() {
   gameState = 'GAMEOVER';
+  // Mostra titolo
   document.getElementById('titleScreen').style.display = 'flex';
+  // Nascondi i controlli touch
+  document.getElementById('controls').style.display = 'none';
+
   lastScore = score;
   bestScore = Math.max(bestScore, score);
   localStorage.setItem(LS_LAST_SCORE, lastScore);
