@@ -1,0 +1,135 @@
+/* Impostazioni base: corpo a pieno schermo, nessun margine */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  font-family: sans-serif;
+}
+
+/* Canvas a piena dimensione, mantiene il ratio 16:9 in verticale */
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: calc(100vw * 16 / 9);
+  background: #f0f0f0;
+}
+
+/* Overlay schermata titolo */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.overlay h1 {
+  font-size: 3em;
+  margin-bottom: 0.5em;
+}
+
+.scores {
+  display: flex;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+.selector p {
+  margin: 0.5em 0;
+}
+
+#emojiChooser {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  justify-content: center;
+}
+
+.emoji-btn {
+  font-size: 2em;
+  background: transparent;
+  border: 2px solid #fff;
+  border-radius: 0.25em;
+  padding: 0.25em;
+  cursor: pointer;
+}
+
+.large-btn {
+  margin-top: 1em;
+  font-size: 1.5em;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 0.5em;
+  background: #28a745;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Controlli touch in basso */
+#controls {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5vw;
+  z-index: 5;
+}
+
+.control-btn {
+  font-size: 2em;
+  background: rgba(0,0,0,0.5);
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+/* HUD: tempo e punteggio */
+#hud {
+  position: absolute;
+  top: 1vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  z-index: 5;
+}
+
+#timeBarContainer {
+  width: 50vw;
+  height: 10px;
+  background: #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+#timeBar {
+  height: 100%;
+  width: 100%;
+  background: #dc3545;
+  transition: width 0.1s linear;
+}
+
+#timeText, #scoreText {
+  font-size: 1.2em;
+}
