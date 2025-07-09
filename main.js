@@ -1,5 +1,7 @@
-// Costanti emoji e probabilità
-const EMOJI_LIST = ['🏀','⚽️','⚾️','🥎','🏈','🏉','🏐','🎱','🧿','🪩','🧶','🥏','🐡','🎃'];
+// Immagine del giocatore
+const PLAYER_IMAGE_SRC = 'Ninja.png';
+let playerImage = new Image();
+playerImage.src = PLAYER_IMAGE_SRC;
 const ELEMENT_TYPES = [
   { type: 'basket',    icon: '🗑', probability: 30 },
   { type: 'brick',     icon: '🧱', probability: 20 },
@@ -57,22 +59,8 @@ function init() {
   document.getElementById('controls').style.display = 'none';
 
   // Imposta listener sulle emoji: seleziona e avvia
-  document.querySelectorAll('.emoji-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Segna selezione
-      document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedEmoji = btn.textContent;
-
-      // Nascondi overlay titolo
-      document.getElementById('titleScreen').style.display = 'none';
-      // Mostra controlli
-      document.getElementById('controls').style.display = 'flex';
-
-      // Avvia la partita
-      startGame();
-    });
-  });
+ 
+});
 
   // Setup touch controls
   setupControls();
@@ -174,10 +162,15 @@ function update(dt) {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Disegna emoji giocatore
-  ctx.font = '48px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(selectedEmoji, player.x, player.y);
+  // Disegna player con immagine
+const imgW = 64, imgH = 64;  // regola queste dimensioni se vuoi
+ctx.drawImage(
+  playerImage,
+  player.x - imgW / 2,
+  player.y - imgH / 2,
+  imgW,
+  imgH
+);
 
   // Disegna elementi
   ctx.font = '32px sans-serif';
