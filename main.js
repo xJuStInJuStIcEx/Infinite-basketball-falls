@@ -147,7 +147,7 @@ function update(dt) {
   }
 
   // Spawn
-  if (Math.random() 0.8 * dt) spawnElement();
+  if (Math.random() < 2 * dt) spawnElement();
 
   // Muovi e filtra elementi
   elements = elements.filter(el => {
