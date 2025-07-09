@@ -2,6 +2,12 @@
 const PLAYER_IMAGE_SRC = 'Ninja.png';
 let playerImage = new Image();
 playerImage.src = PLAYER_IMAGE_SRC;
+// Imposta un flag quando l’immagine è pronta
+let playerImageLoaded = false;
+playerImage.onload = () => {
+  playerImageLoaded = true;
+  console.log('Player image caricata');
+};
 const ELEMENT_TYPES = [
   { type: 'basket',    icon: '🗑', probability: 30 },
   { type: 'brick',     icon: '🧱', probability: 20 },
@@ -163,13 +169,21 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Disegna player con immagine
-ctx.drawImage(
-  playerImage,
-  player.x - imgW/2,
-  player.y - imgH/2,
-  imgW, imgH
-);
-
+// Disegna il tuo Ninja solo se è pronto
+if (playerImageLoaded) {
+  const imgW = 64, imgH = 64; 
+  ctx.drawImage(
+    playerImage,
+    player.x - imgW/2,
+    player.y - imgH/2,
+    imgW, imgH
+  );
+} else {
+  // Se vuoi, mostra un placeholder finché non carica
+  ctx.font = '24px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Loading…', player.x, player.y);
+}
   // Disegna elementi
   ctx.font = '32px sans-serif';
   elements.forEach(el => {
