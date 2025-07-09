@@ -98,7 +98,7 @@ function loop(timestamp) {
     render();
   }
 
-  requestAnimationFrame(loop);
+  requestAnimationFrame(loop); // <--- Questa riga mancava!
 }
 
 function startGame() {
@@ -119,6 +119,7 @@ function startGame() {
   };
   // reset del timestamp per evitare dt gigante
   lastTimestamp = performance.now();
+  requestAnimationFrame(loop); // <-- AVVIA il ciclo qui
 }
 
 function endGame() {
