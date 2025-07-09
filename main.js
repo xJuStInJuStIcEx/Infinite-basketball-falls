@@ -163,13 +163,11 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Disegna player con immagine
-const imgW = 64, imgH = 64;  // regola queste dimensioni se vuoi
 ctx.drawImage(
   playerImage,
-  player.x - imgW / 2,
-  player.y - imgH / 2,
-  imgW,
-  imgH
+  player.x - imgW/2,
+  player.y - imgH/2,
+  imgW, imgH
 );
 
   // Disegna elementi
