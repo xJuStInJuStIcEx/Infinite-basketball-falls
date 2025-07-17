@@ -41,10 +41,27 @@ let lastTimestamp = 0;
 window.addEventListener('DOMContentLoaded', init);
 
 function init() {
-  canvas = document.getElementById('gameCanvas');
-  ctx = canvas.getContext('2d');
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+  // … codice esistente …
 
-  bestScore = parseInt(localStorage.getItem(LS_BEST_SCORE)) || 0;
-  lastScore = parseInt(localStorage.getItem(LS_LAST
+  // Nascondi controlli di default
+  document.getElementById('controls').style.display = 'none';
+
+  // Seleziona il pulsante “Inizia!” e aggiungi il listener
+  const startBtn = document.getElementById('startBtn');
+  startBtn.addEventListener('click', () => {
+    // Nascondi overlay titolo
+    document.getElementById('titleScreen').style.display = 'none';
+    // Aggiungi classe playing per mostrare controlli
+    document.body.classList.add('playing');
+    // Mostra i controlli touch
+    document.getElementById('controls').style.display = 'flex';
+    // Avvia la partita
+    startGame();
+  });
+
+  // Setup controlli touch
+  setupControls();
+
+  // Avvia il loop di gioco
+  requestAnimationFrame(loop);
+}
