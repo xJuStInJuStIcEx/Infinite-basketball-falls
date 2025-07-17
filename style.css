@@ -27,7 +27,7 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -58,18 +58,53 @@ html, body {
   justify-content: center;
 }
 
+/* Emoji button – stile unificato */
 .emoji-btn {
-  display: inline-block;        /* Assicura dimensioni e posizionamento */
-  position: relative;           /* Necessario per il pseudo-elemento */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 3em;
+  height: 3em;
   font-size: 2em;
-  background: transparent;
-  border: 2px solid #fff;
-  border-radius: 0.25em;
-  padding: 0.25em;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 0.5em;
+  margin: 0.25em;
+  padding: 0;
   cursor: pointer;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
+/* Hover/focus per feedback rapido */
+.emoji-btn:hover,
+.emoji-btn:focus {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Stato selezionato */
+.emoji-btn.selected {
+  background: rgba(255, 193, 7, 0.3) !important;
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.8) !important;
+}
+
+/* Spunta in alto a destra */
+.emoji-btn.selected::after {
+  content: '✔️';
+  position: absolute;
+  top: -0.4em;
+  right: -0.4em;
+  font-size: 0.75em;
+  background: #fff;
+  border-radius: 50%;
+}
+
+/* Bottone grande (es. start game) */
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
@@ -82,7 +117,6 @@ html, body {
 }
 
 /* Controlli touch in basso */
-/* Controlli touch di default nascosti */
 #controls {
   position: absolute;
   bottom: 5vh;
@@ -93,14 +127,14 @@ html, body {
   z-index: 5;
 }
 
-/* Quando il body ha classe “playing”, mostra i controlli */
+/* Mostra i controlli quando il body ha classe "playing" */
 body.playing #controls {
   display: flex !important;
 }
 
 .control-btn {
   font-size: 2em;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
   width: 60px;
@@ -139,63 +173,7 @@ body.playing #controls {
   transition: width 0.1s linear;
 }
 
-#timeText, #scoreText {
+#timeText,
+#scoreText {
   font-size: 1.2em;
 }
-
-/* ============================= */
-/* Selettore Emoji – Stile Rifatto */
-/* ============================= */
-
-/* Base */
-.emoji-btn {
-  display: inline-flex;         /* elemento flessibile */
-  align-items: center;
-  justify-content: center;
-  position: relative;           /* necessario per ::after */
-  width: 3em;                   /* larghezza fissa */
-  height: 3em;                  /* altezza fissa */
-  font-size: 2em;
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(255,255,255,0.5);
-  border-radius: 0.5em;
-  margin: 0.25em;
-  padding: 0;
-  cursor: pointer;
-  transition: 
-    background 0.2s, 
-    border-color 0.2s, 
-    box-shadow 0.2s;
-  box-sizing: border-box;
-}
-
-/* Hover/focus per feedback rapido */
-.emoji-btn:hover,
-.emoji-btn:focus {
-  background: rgba(255,255,255,0.2);
-}
-
-/* Stato selezionato */
-.emoji-btn.selected {
-  background: rgba(255,193,7,0.3) !important;       /* giallo trasparente */
-  border-color: #ffc107 !important;                  /* giallo pieno */
-  box-shadow: 0 0 8px rgba(255,193,7,0.8) !important;
-}
-
-/* Spunta in alto a destra */
-.emoji-btn.selected::after {
-  content: '✔️';
-  position: absolute;
-  top: -0.4em;
-  right: -0.4em;
-  font-size: 0.75em;
-  background: #fff;
-  border-radius: 50%;
-}
-
-/* Nascondi controlli nella schermata di avvio
-#controls {
-  display: none;
-}
-
-/* ============================= */
