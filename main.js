@@ -262,3 +262,12 @@ function disableControls(sec) {
   player.controlsDisabled = true;
   setTimeout(() => player.controlsDisabled = false, sec * 1000);
 }
+
+function log(msg) {
+  const logDiv = document.getElementById('debugLog');
+  if (logDiv) {
+    const time = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `[${time}] ${msg}<br>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+}
