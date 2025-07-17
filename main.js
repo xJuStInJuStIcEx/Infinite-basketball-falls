@@ -1,13 +1,14 @@
 // Immagine del giocatore
 const PLAYER_IMAGE_SRC = 'Ninja.png';
 let playerImage = new Image();
-playerImage.src = PLAYER_IMAGE_SRC;
 let playerImageLoaded = false;
 playerImage.onload = () => {
   playerImageLoaded = true;
   console.log('Player image caricata');
 };
+playerImage.src = PLAYER_IMAGE_SRC;
 
+// Definizione degli elementi cadenti
 const ELEMENT_TYPES = [
   { type: 'basket',    icon: '🗑', probability: 30 },
   { type: 'brick',     icon: '🧱', probability: 20 },
@@ -18,50 +19,66 @@ const ELEMENT_TYPES = [
   { type: 'timeBonus', icon: '🕑', probability: 15 }
 ];
 
+// Parametri di gioco
 const GAME_DURATION    = 180;
 const FALL_SPEED       = 100;
 const SIDE_SPEED       = 200;
 const EFFECT_DURATIONS = { bounceDisable: 3, slow: 10, fast: 10, magnetUses: 5 };
 
+// LocalStorage keys
 const LS_BEST_SCORE = 'bestScore';
 const LS_LAST_SCORE = 'lastScore';
 
+// Stato e variabili globali
 let canvas, ctx;
 let screenWidth, screenHeight;
-let gameState = 'TITLE';
-let bestScore = 0;
-let lastScore = 0;
+let gameState     = 'TITLE';
+let bestScore     = 0;
+let lastScore     = 0;
 
+// Runtime
 let player = {};
 let elements = [];
 let timeLeft = GAME_DURATION;
-let score = 0;
+let score    = 0;
 let lastTimestamp = 0;
 
+// Inizializzazione
 window.addEventListener('DOMContentLoaded', init);
 
 function init() {
+  // Setup canvas
   canvas = document.getElementById('gameCanvas');
-  ctx = canvas.getContext('2d');
+  ctx    = canvas.getContext('2d');
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
+  // Carica punteggi
   bestScore = parseInt(localStorage.getItem(LS_BEST_SCORE)) || 0;
   lastScore = parseInt(localStorage.getItem(LS_LAST_SCORE)) || 0;
   document.getElementById('bestScore').textContent = bestScore;
   document.getElementById('lastScore').textContent = lastScore;
 
+  // Nascondi controlli e mostra bottone Inizia
   document.getElementById('controls').style.display = 'none';
+  const startBtn = document.getElementById('startBtn');
+  startBtn.addEventListener('click', () => {
+    document.getElementById('titleScreen').style.display = 'none';
+    document.body.classList.add('playing');
+    startGame();
+  });
 
+  // Setup controlli touch
   setupControls();
 
+  // Avvia il loop di render/update
   requestAnimationFrame(loop);
 }
 
 function resizeCanvas() {
-  screenWidth = window.innerWidth;
+  screenWidth  = window.innerWidth;
   screenHeight = window.innerWidth * 16 / 9;
-  canvas.width = screenWidth;
+  canvas.width  = screenWidth;
   canvas.height = screenHeight;
   canvas.style.height = screenHeight + 'px';
 }
@@ -79,13 +96,11 @@ function loop(timestamp) {
 }
 
 function startGame() {
-  document.body.classList.add('playing');
-
   gameState = 'PLAYING';
-  timeLeft = GAME_DURATION;
-  score = 0;
-  elements = [];
-  player = {
+  timeLeft  = GAME_DURATION;
+  score     = 0;
+  elements  = [];
+  player    = {
     x: screenWidth / 2,
     y: screenHeight / 4,
     sideSpeed: SIDE_SPEED,
@@ -93,8 +108,6 @@ function startGame() {
     magnetUses: 0,
     controlsDisabled: false
   };
-  lastTimestamp = performance.now();
-  requestAnimationFrame(loop);
 }
 
 function endGame() {
@@ -111,26 +124,32 @@ function endGame() {
 }
 
 function update(dt) {
+  // Timer
   timeLeft -= dt;
   if (timeLeft <= 0) {
     endGame();
     return;
   }
 
+  // Spawn
   if (Math.random() < 1.2 * dt) spawnElement();
 
+  // Movimento elementi
   elements = elements.filter(el => {
     el.y -= FALL_SPEED * dt;
     return el.y + 32 > 0;
   });
 
+  // Effetto calamita
   if (player.magnetUses > 0) applyMagnet();
 
+  // Movimento giocatore
   if (!player.controlsDisabled) {
     player.x += (player.vx || 0) * dt;
     player.x = Math.max(0, Math.min(screenWidth, player.x));
   }
 
+  // Collisioni
   elements.forEach(el => {
     if (isColliding(player, el)) handleCollision(el);
   });
@@ -139,6 +158,7 @@ function update(dt) {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // Disegna giocatore
   if (playerImageLoaded) {
     const imgW = 64, imgH = 64;
     ctx.drawImage(playerImage, player.x - imgW / 2, player.y - imgH / 2, imgW, imgH);
@@ -148,14 +168,15 @@ function render() {
     ctx.fillText('Loading…', player.x, player.y);
   }
 
+  // Disegna elementi
   ctx.font = '32px sans-serif';
   elements.forEach(el => {
     ctx.fillText(el.icon, el.x, el.y);
   });
 
-  const timePct = timeLeft / GAME_DURATION;
-  document.getElementById('timeBar').style.width = `${timePct * 100}%`;
-  document.getElementById('timeText').textContent = Math.ceil(timeLeft);
+  // HUD
+  document.getElementById('timeBar').style.width = `${(timeLeft / GAME_DURATION) * 100}%`;
+  document.getElementById('timeText').textContent  = Math.ceil(timeLeft);
   document.getElementById('scoreText').textContent = score;
 }
 
@@ -195,8 +216,7 @@ function spawnElement() {
 }
 
 function isColliding(p, el) {
-  const size = 32;
-  return Math.abs(p.x - el.x) < size && Math.abs(p.y - el.y) < size;
+  return Math.abs(p.x - el.x) < 32 && Math.abs(p.y - el.y) < 32;
 }
 
 function handleCollision(el) {
@@ -205,7 +225,6 @@ function handleCollision(el) {
       score += 10;
       break;
     case 'brick':
-      player.vx = 0;
       disableControls(EFFECT_DURATIONS.bounceDisable);
       break;
     case 'sword':
@@ -241,7 +260,5 @@ function applyMagnet() {
 
 function disableControls(sec) {
   player.controlsDisabled = true;
-  setTimeout(() => {
-    player.controlsDisabled = false;
-  }, sec * 1000);
+  setTimeout(() => player.controlsDisabled = false, sec * 1000);
 }
