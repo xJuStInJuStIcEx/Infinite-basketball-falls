@@ -172,7 +172,7 @@ function resizeCanvas() {
   canvas.width  = screenWidth;
   canvas.height = screenWidth * 9 / 16;
   // regola anche lo style-height per mantenere il container corretto
-  canvas.style.height = screenHeight + 'px';
+  canvas.style.height = (screenWidth * 9 / 16) + 'px';
 }
 
 // Inizia partita
