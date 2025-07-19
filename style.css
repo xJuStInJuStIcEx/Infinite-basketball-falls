@@ -1,17 +1,17 @@
 /* Variables */
 :root {
-  --bg-light: #f0f0f0;
-  --overlay-bg: rgba(0, 0, 0, 0.8);
-  --text-white: #fff;
-  --btn-primary: #28a745;
-  --btn-accent: #ffc107;
-  --font-main: sans-serif;
-  --btn-size: 3em;
-  --control-dim: 60px;
-  --ratio-16-9: 56.25%; /* 9/16 × 100 */
+  --bg-light:     #f0f0f0;
+  --overlay-bg:   rgba(0, 0, 0, 0.8);
+  --text-white:   #fff;
+  --btn-primary:  #28a745;
+  --btn-accent:   #ffc107;
+  --font-main:    sans-serif;
+  --btn-size:     3em;
+  --control-dim:  60px;
+  --ratio-16-9:   56.25%; /* 9/16 x 100 */
 }
 
-/* Reset and base styles */
+/* Reset & base */
 html, body {
   margin: 0;
   padding: 0;
@@ -25,33 +25,26 @@ html, body {
 /* Canvas container for 16:9 ratio */
 .canvas-container {
   position: relative;
-  width: 100%;
+  width: 100vw;
   padding-top: var(--ratio-16-9);
   overflow: hidden;
 }
 
-/* Game canvas */
+/* Game canvas full inside container */
 #gameCanvas {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background: var(--bg-light);
+  z-index: 1;
 }
 
-/* Common absolute-centered overlay, controls, HUD */
-.overlay,
-#controls,
-#hud {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-}
-
-/* Title-screen overlay */
+/* Title overlay */
 .overlay {
-  top: 0;
+  position: absolute;
+  top: 0; left: 0;
   width: 100vw;
   height: 100vh;
   background: var(--overlay-bg);
@@ -85,7 +78,7 @@ html, body {
   justify-content: center;
 }
 
-/* Shared styles for emoji and control buttons */
+/* Emoji & control buttons */
 .emoji-btn,
 .control-btn {
   display: inline-flex;
@@ -102,23 +95,22 @@ html, body {
   width: var(--btn-size);
   height: var(--btn-size);
   font-size: 2em;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.5);
   border-radius: 0.5em;
   margin: 0.25em;
-  padding: 0;
   box-sizing: border-box;
 }
 
 .emoji-btn:hover,
 .emoji-btn:focus {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.2);
 }
 
 .emoji-btn.selected {
-  background: rgba(255, 193, 7, 0.3);
+  background: rgba(255,193,7,0.3);
   border-color: var(--btn-accent);
-  box-shadow: 0 0 8px rgba(255, 193, 7, 0.8);
+  box-shadow: 0 0 8px rgba(255,193,7,0.8);
 }
 
 .emoji-btn.selected::after {
@@ -131,7 +123,7 @@ html, body {
   border-radius: 50%;
 }
 
-/* Large buttons (e.g., start game) */
+/* Start button */
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
@@ -142,33 +134,40 @@ html, body {
   color: var(--text-white);
 }
 
-/* Touch controls */
+/* Touch controls at edges */
 #controls {
+  position: absolute;
   bottom: 5vh;
-  display: none;
-  gap: 5vw;
-}
-
-body.playing #controls {
+  left: 0;
+  width: 100%;
   display: flex;
+  justify-content: space-between;
+  padding: 0 5vw;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .control-btn {
   width: var(--control-dim);
   height: var(--control-dim);
   font-size: 2em;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0,0,0,0.5);
   border: none;
   border-radius: 50%;
   color: var(--text-white);
+  pointer-events: auto;
 }
 
-/* HUD (time and score) */
+/* HUD: time bar & score */
 #hud {
+  position: absolute;
   top: 1vh;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 2vw;
+  z-index: 5;
 }
 
 #timeBarContainer {
