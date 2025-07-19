@@ -2,14 +2,33 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
   <title>Caduta Emoji</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <!-- SCHERMATA TITOLO -->
   <div id="titleScreen" class="overlay">
-    <div id="debugLog" style="position:fixed; bottom:0; left:0; right:0; max-height:150px; overflow:auto; background:#000; color:#0f0; font-size:14px; padding:5px; font-family:monospace; z-index:9999;"></div>
+    <div
+      id="debugLog"
+      style="
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-height: 150px;
+        overflow: auto;
+        background: #000;
+        color: #0f0;
+        font-size: 14px;
+        padding: 5px;
+        font-family: monospace;
+        z-index: 9999;
+      "
+    ></div>
     <h1>Caduta Emoji</h1>
     <div class="scores">
       <div>Best Score: <span id="bestScore">0</span></div>
@@ -18,14 +37,18 @@
     <div class="selector">
       <p>Sarai questo personaggio:</p>
       <div id="emojiChooser">
-        <img src="Ninja.png" alt="Ninja" width="64" height="64" />
+        <button class="emoji-btn selected">
+          <img src="Ninja.png" alt="Ninja" width="48" height="48" />
+        </button>
       </div>
     </div>
     <button id="startBtn" class="large-btn">Inizia!</button>
   </div>
 
-  <!-- CANVAS DI GIOCO -->
-  <canvas id="gameCanvas"></canvas>
+  <!-- CONTENITORE 16:9 E CANVAS DI GIOCO -->
+  <div class="canvas-container">
+    <canvas id="gameCanvas"></canvas>
+  </div>
 
   <!-- CONTROLLI TOUCH -->
   <div id="controls">
@@ -33,7 +56,7 @@
     <button id="rightBtn" class="control-btn">⏩</button>
   </div>
 
-  <!-- BARRA E INDICATORI -->
+  <!-- HUD: BARRA TEMPO E PUNTEGGIO -->
   <div id="hud">
     <div id="timeBarContainer">
       <div id="timeBar"></div>
@@ -45,3 +68,4 @@
   <script src="main.js"></script>
 </body>
 </html>
+```[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/iamwebwiz/foodie/tree/5d79354d8ff681575f479b4c05e6b446c8be5dd2/resources%2Fviews%2Flayouts%2Fadmin.blade.php?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")
