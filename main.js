@@ -322,11 +322,3 @@ function isColliding(p, el) {
 
   return !noOverlap;
 }
-
-// Debug log su schermo
-function log(msg) {
-  if (!debugLog) return;
-  const time = new Date().toLocaleTimeString();
-  debugLog.innerHTML += `[${time}] ${msg}<br>`;
-  debugLog.scrollTop = debugLog.scrollHeight;
-}
