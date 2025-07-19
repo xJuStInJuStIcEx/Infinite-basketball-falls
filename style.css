@@ -21,18 +21,20 @@ html, body {
   font-family: var(--font-main);
 }
 
-/* Full-screen game canvas */
+/* Canvas a piena dimensione mantenendo ratio 16:9 */
 #gameCanvas {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: calc(100vw * 16 / 9);
   background: var(--bg-light);
   z-index: 1;
 }
 
-/* Title-screen overlay */
-#titleScreen.overlay {
+/* Overlay titolo */
+.overlay {
   position: absolute;
   top: 0; left: 0;
   width: 100vw;
@@ -46,33 +48,42 @@ html, body {
   z-index: 10;
 }
 
-#titleScreen.overlay h1 {
+.overlay h1 {
   font-size: 3em;
   margin-bottom: 0.5em;
 }
 
-#titleScreen .scores {
+.scores {
   display: flex;
   gap: 1em;
   margin-bottom: 1em;
 }
 
-#titleScreen .selector p {
+.selector p {
   margin: 0.5em 0;
 }
 
-#titleScreen #emojiChooser {
+#emojiChooser {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5em;
   justify-content: center;
+}
+
+/* Emoji & control buttons */
+.emoji-btn,
+.control-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  touch-action: none;
 }
 
 /* Emoji buttons */
 .emoji-btn {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: var(--btn-size);
   height: var(--btn-size);
   font-size: 2em;
@@ -81,9 +92,6 @@ html, body {
   border-radius: 0.5em;
   margin: 0.25em;
   box-sizing: border-box;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-  touch-action: none;
 }
 
 .emoji-btn:hover,
@@ -107,7 +115,7 @@ html, body {
   border-radius: 50%;
 }
 
-/* “Inizia” button */
+/* Pulsante “Inizia!” */
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
@@ -116,10 +124,9 @@ html, body {
   border-radius: 0.5em;
   background: var(--btn-primary);
   color: var(--text-white);
-  cursor: pointer;
 }
 
-/* Touch controls at screen edges */
+/* CONTROLLI TOUCH: frecce ai bordi */
 #controls {
   position: absolute;
   bottom: 5vh;
@@ -129,7 +136,7 @@ html, body {
   justify-content: space-between;
   padding: 0 5vw;
   z-index: 5;
-  pointer-events: none; /* disable on container */
+  pointer-events: none; /* disabilita clic sull’area vuota */
 }
 
 .control-btn {
@@ -140,11 +147,10 @@ html, body {
   border: none;
   border-radius: 50%;
   color: var(--text-white);
-  pointer-events: auto; /* re-enable on buttons */
-  cursor: pointer;
+  pointer-events: auto; /* abilita clic solo sui bottoni */
 }
 
-/* HUD: time-bar & score */
+/* HUD: barra tempo e punteggio */
 #hud {
   position: absolute;
   top: 1vh;
