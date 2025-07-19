@@ -1,204 +1,91 @@
-// COSTANTI DI GIOCO
-const PLAYER_IMAGE_SRC  = 'Ninja.png';
-const GAME_DURATION     = 180;    // secondi
-const FALL_SPEED        = 100;    // px/s
-const SIDE_SPEED        = 200;    // px/s
-const EFFECT_DURATIONS  = { bounceDisable: 3, slow: 10, fast: 10, magnetUses: 5 };
-const LS_BEST_SCORE     = 'bestScore';
-const LS_LAST_SCORE     = 'lastScore';
+// Immagine del giocatore
+const PLAYER_IMAGE_SRC = 'Ninja.png';
+let playerImage = new Image();
+let playerImageLoaded = false;
+playerImage.onload = () => {
+  playerImageLoaded = true;
+  console.log('Player image caricata');
+};
+playerImage.src = PLAYER_IMAGE_SRC;
 
-// Tipi di elementi cadenti e probabilità
+// Definizione degli elementi cadenti
 const ELEMENT_TYPES = [
-  { type: 'basket',    icon: '🗑',  probability: 30 },
+  { type: 'basket',    icon: '🗑', probability: 30 },
   { type: 'brick',     icon: '🧱', probability: 20 },
-  { type: 'sword',     icon: '⚔️',  probability: 10 },
-  { type: 'snail',     icon: '🐌',  probability: 20 },
-  { type: 'battery',   icon: '🔋',  probability: 20 },
+  { type: 'sword',     icon: '⚔️', probability: 10 },
+  { type: 'snail',     icon: '🐌', probability: 20 },
+  { type: 'battery',   icon: '🔋', probability: 20 },
   { type: 'magnet',    icon: '🧲', probability: 15 },
-  { type: 'timeBonus', icon: '🕑',  probability: 15 }
+  { type: 'timeBonus', icon: '🕑', probability: 15 }
 ];
 
-// CACHE PROBABILITÀ CUMULATIVE PER SPAWN
-const spawnCumulProb = (() => {
-  let acc = 0;
-  return ELEMENT_TYPES.map(t => {
-    acc += t.probability;
-    return { ...t, threshold: acc };
-  });
-})();
+// Parametri di gioco
+const GAME_DURATION    = 180;
+const FALL_SPEED       = 100;
+const SIDE_SPEED       = 200;
+const EFFECT_DURATIONS = { bounceDisable: 3, slow: 10, fast: 10, magnetUses: 5 };
 
-// STATI E VARIABILI GLOBALI
+// LocalStorage keys
+const LS_BEST_SCORE = 'bestScore';
+const LS_LAST_SCORE = 'lastScore';
+
+// Stato e variabili globali
 let canvas, ctx;
-let titleScreen, controlsEl, startBtn;
-let leftBtn, rightBtn;
-let timeBar, timeText, scoreText;
-let debugLog;
-let screenW, screenH;
-
-let gameState     = 'TITLE';   // TITLE | PLAYING | GAMEOVER
+let screenWidth, screenHeight;
+let gameState     = 'TITLE';
 let bestScore     = 0;
 let lastScore     = 0;
 
-// Oggetti runtime
-let player;
-let elements      = [];
-let timeLeft      = GAME_DURATION;
-let score         = 0;
+// Runtime
+let player = {};
+let elements = [];
+let timeLeft = GAME_DURATION;
+let score    = 0;
 let lastTimestamp = 0;
 
-// CLASSE GIOCATORE
-class Player {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.vx = 0;
-    this.sideSpeed = SIDE_SPEED;
-    this.effects = { slow: 0, fast: 0, bounceDisable: 0 };
-    this.magnetUses = 0;
-    this.imgLoaded = false;
-    this.img = new Image();
-    this.img.onload = () => this.imgLoaded = true;
-    this.img.src = PLAYER_IMAGE_SRC;
-  }
-
-  update(dt) {
-    // Aggiorna timer effetti
-    for (let e in this.effects) {
-      if (this.effects[e] > 0) {
-        this.effects[e] = Math.max(0, this.effects[e] - dt);
-      }
-    }
-
-    // Muovi orizzontalmente se non bloccato
-    if (this.effects.bounceDisable <= 0) {
-      this.x += this.vx * dt;
-      // Limita ai bordi
-      this.x = Math.max(0, Math.min(screenW, this.x));
-    }
-  }
-
-  draw(ctx) {
-    const size = 64;
-    if (this.imgLoaded) {
-      ctx.drawImage(
-        this.img,
-        this.x - size/2,
-        this.y - size/2,
-        size, size
-      );
-    } else {
-      ctx.font = '24px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('Loading…', this.x, this.y);
-    }
-  }
-}
-
-// CLASSE ELEMENTI CADENTI
-class FallingElement {
-  constructor(type, icon, x, y) {
-    this.type = type;
-    this.icon = icon;
-    this.x = x;
-    this.y = y;
-  }
-
-  update(dt) {
-    this.y -= FALL_SPEED * dt;
-  }
-
-  draw(ctx) {
-    ctx.fillText(this.icon, this.x, this.y);
-  }
-}
-
-// INIZIALIZZAZIONE
+// Inizializzazione
 window.addEventListener('DOMContentLoaded', init);
 
 function init() {
-  // Riferimenti DOM
-  canvas       = document.getElementById('gameCanvas');
-  ctx          = canvas.getContext('2d');
-  titleScreen  = document.getElementById('titleScreen');
-  controlsEl   = document.getElementById('controls');
-  startBtn     = document.getElementById('startBtn');
-  leftBtn      = document.getElementById('leftBtn');
-  rightBtn     = document.getElementById('rightBtn');
-  timeBar      = document.getElementById('timeBar');
-  timeText     = document.getElementById('timeText');
-  scoreText    = document.getElementById('scoreText');
-  debugLog     = document.getElementById('debugLog');
-
-  // Canvas responsive
-  window.addEventListener('resize', resizeCanvas);
+  // Setup canvas
+  canvas = document.getElementById('gameCanvas');
+  ctx    = canvas.getContext('2d');
   resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
-  // Carica punteggi da LocalStorage
+  // Carica punteggi
   bestScore = parseInt(localStorage.getItem(LS_BEST_SCORE)) || 0;
   lastScore = parseInt(localStorage.getItem(LS_LAST_SCORE)) || 0;
   document.getElementById('bestScore').textContent = bestScore;
   document.getElementById('lastScore').textContent = lastScore;
 
-  // Bottone Inizia
+  // Nascondi controlli e mostra bottone Inizia
+  document.getElementById('controls').style.display = 'none';
+  const startBtn = document.getElementById('startBtn');
   startBtn.addEventListener('click', () => {
-    titleScreen.style.display = 'none';
+    document.getElementById('titleScreen').style.display = 'none';
     document.body.classList.add('playing');
     startGame();
   });
 
-  // Setup controlli (pointer per mouse e touch)
-  leftBtn.addEventListener('pointerdown', () => {
-    if (player.effects.bounceDisable <= 0) player.vx = -SIDE_SPEED;
-  });
-  rightBtn.addEventListener('pointerdown', () => {
-    if (player.effects.bounceDisable <= 0) player.vx = SIDE_SPEED;
-  });
-  ['pointerup','pointerleave'].forEach(evt => {
-    leftBtn.addEventListener(evt,  () => player.vx = 0);
-    rightBtn.addEventListener(evt, () => player.vx = 0);
-  });
+  // Setup controlli touch
+  setupControls();
 
-  // Avvia loop
+  // Avvia il loop di render/update
   requestAnimationFrame(loop);
 }
 
-// Adatta canvas alla dimensione del container
 function resizeCanvas() {
   screenWidth  = window.innerWidth;
-  screenHeight = screenWidth * 16 / 9;
+  screenHeight = window.innerWidth * 16 / 9;
   canvas.width  = screenWidth;
   canvas.height = screenHeight;
   canvas.style.height = screenHeight + 'px';
 }
 
-// Inizia partita
-function startGame() {
-  gameState = 'PLAYING';
-  timeLeft  = GAME_DURATION;
-  score     = 0;
-  elements  = [];
-  player    = new Player(screenW/2, screenH/4);
-  lastTimestamp = performance.now();
-}
-
-// Termina partita
-function endGame() {
-  gameState = 'GAMEOVER';
-  document.body.classList.remove('playing');
-  titleScreen.style.display = 'flex';
-
-  lastScore = score;
-  bestScore = Math.max(bestScore, score);
-  localStorage.setItem(LS_LAST_SCORE, lastScore);
-  localStorage.setItem(LS_BEST_SCORE, bestScore);
-  document.getElementById('lastScore').textContent = lastScore;
-  document.getElementById('bestScore').textContent = bestScore;
-}
-
-// Loop principale
-function loop(ts) {
-  const dt = (ts - lastTimestamp) / 1000;
-  lastTimestamp = ts;
+function loop(timestamp) {
+  const dt = (timestamp - lastTimestamp) / 1000;
+  lastTimestamp = timestamp;
 
   if (gameState === 'PLAYING') {
     update(dt);
@@ -208,7 +95,34 @@ function loop(ts) {
   requestAnimationFrame(loop);
 }
 
-// Aggiorna stato di gioco
+function startGame() {
+  gameState = 'PLAYING';
+  timeLeft  = GAME_DURATION;
+  score     = 0;
+  elements  = [];
+  player    = {
+    x: screenWidth / 2,
+    y: screenHeight / 4,
+    sideSpeed: SIDE_SPEED,
+    vx: 0,
+    magnetUses: 0,
+    controlsDisabled: false
+  };
+}
+
+function endGame() {
+  gameState = 'GAMEOVER';
+  document.body.classList.remove('playing');
+  document.getElementById('titleScreen').style.display = 'flex';
+
+  lastScore = score;
+  bestScore = Math.max(bestScore, score);
+  localStorage.setItem(LS_LAST_SCORE, lastScore);
+  localStorage.setItem(LS_BEST_SCORE, bestScore);
+  document.getElementById('lastScore').textContent = lastScore;
+  document.getElementById('bestScore').textContent = bestScore;
+}
+
 function update(dt) {
   // Timer
   timeLeft -= dt;
@@ -217,20 +131,23 @@ function update(dt) {
     return;
   }
 
-  // Spawn casuale
-  if (Math.random() < 1.2 * dt) spawnRandomElement();
+  // Spawn
+  if (Math.random() < 1.2 * dt) spawnElement();
 
-  // Aggiorna elementi e li filtra quando fuori schermo
+  // Movimento elementi
   elements = elements.filter(el => {
-    el.update(dt);
+    el.y -= FALL_SPEED * dt;
     return el.y + 32 > 0;
   });
 
   // Effetto calamita
   if (player.magnetUses > 0) applyMagnet();
 
-  // Aggiorna giocatore
-  player.update(dt);
+  // Movimento giocatore
+  if (!player.controlsDisabled) {
+    player.x += (player.vx || 0) * dt;
+    player.x = Math.max(0, Math.min(screenWidth, player.x));
+  }
 
   // Collisioni
   elements.forEach(el => {
@@ -238,54 +155,88 @@ function update(dt) {
   });
 }
 
-// Renderizza scena
 function render() {
-  ctx.clearRect(0, 0, screenW, screenH);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Giocatore
-  player.draw(ctx);
+  // Disegna giocatore
+  if (playerImageLoaded) {
+    const imgW = 64, imgH = 64;
+    ctx.drawImage(playerImage, player.x - imgW / 2, player.y - imgH / 2, imgW, imgH);
+  } else {
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Loading…', player.x, player.y);
+  }
 
-  // Elementi cadenti
+  // Disegna elementi
   ctx.font = '32px sans-serif';
-  elements.forEach(el => el.draw(ctx));
+  elements.forEach(el => {
+    ctx.fillText(el.icon, el.x, el.y);
+  });
 
   // HUD
-  timeBar.style.width = `${(timeLeft / GAME_DURATION) * 100}%`;
-  timeText.textContent  = Math.ceil(timeLeft);
-  scoreText.textContent = score;
+  document.getElementById('timeBar').style.width = `${(timeLeft / GAME_DURATION) * 100}%`;
+  document.getElementById('timeText').textContent  = Math.ceil(timeLeft);
+  document.getElementById('scoreText').textContent = score;
 }
 
-// Crea un nuovo elemento in base a probabilità
-function spawnRandomElement() {
-  const r = Math.random() * spawnCumulProb.slice(-1)[0].threshold;
-  const t = spawnCumulProb.find(o => r <= o.threshold);
-  elements.push(
-    new FallingElement(
-      t.type,
-      t.icon,
-      Math.random() * screenW,
-      screenH + 32
-    )
-  );
+function setupControls() {
+  const leftBtn = document.getElementById('leftBtn');
+  const rightBtn = document.getElementById('rightBtn');
+
+  leftBtn.addEventListener('touchstart', () => {
+    if (!player.controlsDisabled) player.vx = -player.sideSpeed;
+  });
+  leftBtn.addEventListener('touchend', () => {
+    player.vx = 0;
+  });
+  rightBtn.addEventListener('touchstart', () => {
+    if (!player.controlsDisabled) player.vx = player.sideSpeed;
+  });
+  rightBtn.addEventListener('touchend', () => {
+    player.vx = 0;
+  });
 }
 
-// Gestione collisione
+function spawnElement() {
+  const rand = Math.random() * 100;
+  let acc = 0;
+  for (const t of ELEMENT_TYPES) {
+    acc += t.probability;
+    if (rand <= acc) {
+      elements.push({
+        type: t.type,
+        icon: t.icon,
+        x: Math.random() * screenWidth,
+        y: screenHeight + 32
+      });
+      break;
+    }
+  }
+}
+
+function isColliding(p, el) {
+  return Math.abs(p.x - el.x) < 32 && Math.abs(p.y - el.y) < 32;
+}
+
 function handleCollision(el) {
   switch (el.type) {
     case 'basket':
       score += 10;
       break;
     case 'brick':
-      player.effects.bounceDisable = EFFECT_DURATIONS.bounceDisable;
+      disableControls(EFFECT_DURATIONS.bounceDisable);
       break;
     case 'sword':
       timeLeft = 0;
       break;
     case 'snail':
-      player.effects.slow = EFFECT_DURATIONS.slow;
+      player.sideSpeed /= 2;
+      setTimeout(() => player.sideSpeed = SIDE_SPEED, EFFECT_DURATIONS.slow * 1000);
       break;
     case 'battery':
-      player.effects.fast = EFFECT_DURATIONS.fast;
+      player.sideSpeed *= 1.5;
+      setTimeout(() => player.sideSpeed = SIDE_SPEED, EFFECT_DURATIONS.fast * 1000);
       break;
     case 'magnet':
       player.magnetUses = EFFECT_DURATIONS.magnetUses;
@@ -294,24 +245,29 @@ function handleCollision(el) {
       timeLeft = Math.min(GAME_DURATION, timeLeft + 10);
       break;
   }
-  elements = elements.filter(x => x !== el);
+  elements = elements.filter(e => e !== el);
 }
 
-// Controllo calamita: attira solo 'basket'
 function applyMagnet() {
   elements.forEach(item => {
     if (item.type === 'basket') {
       const dir = player.x > item.x ? 1 : -1;
-      item.x += dir * (SIDE_SPEED / 2) * (1 / 60);
+      item.x += dir * (player.sideSpeed / 2) * (1 / 60);
     }
   });
   player.magnetUses--;
 }
 
-// Collisioni AABB semplice
-function isColliding(p, el) {
-  return (
-    Math.abs(p.x - el.x) < 32 &&
-    Math.abs(p.y - el.y) < 32
-  );
+function disableControls(sec) {
+  player.controlsDisabled = true;
+  setTimeout(() => player.controlsDisabled = false, sec * 1000);
+}
+
+function log(msg) {
+  const logDiv = document.getElementById('debugLog');
+  if (logDiv) {
+    const time = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `[${time}] ${msg}<br>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
 }
