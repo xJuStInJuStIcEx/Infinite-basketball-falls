@@ -315,11 +315,3 @@ function isColliding(p, el) {
     Math.abs(p.y - el.y) < 32
   );
 }
-
-// Debug log su schermo
-function log(msg) {
-  if (!debugLog) return;
-  const time = new Date().toLocaleTimeString();
-  debugLog.innerHTML += `[${time}] ${msg}<br>`;
-  debugLog.scrollTop = debugLog.scrollHeight;
-}
