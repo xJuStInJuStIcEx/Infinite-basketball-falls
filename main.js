@@ -1,5 +1,3 @@
-// main.js – Codice ottimizzato
-
 // COSTANTI DI GIOCO
 const PLAYER_IMAGE_SRC  = 'Ninja.png';
 const GAME_DURATION     = 180;    // secondi
@@ -166,13 +164,11 @@ function init() {
 
 // Adatta canvas alla dimensione del container
 function resizeCanvas() {
-  // dimensioni basate su container 16:9 (come nel CSS)
   screenWidth  = window.innerWidth;
-  screenHeight = screenWidth * 9 / 16;
+  screenHeight = screenWidth * 16 / 9;
   canvas.width  = screenWidth;
-  canvas.height = screenWidth * 9 / 16;
-  // regola anche lo style-height per mantenere il container corretto
-  canvas.style.height = (screenWidth * 9 / 16) + 'px';
+  canvas.height = screenHeight;
+  canvas.style.height = screenHeight + 'px';
 }
 
 // Inizia partita
