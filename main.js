@@ -168,9 +168,9 @@ function init() {
 function resizeCanvas() {
   // dimensioni basate su container 16:9 (come nel CSS)
   screenWidth  = window.innerWidth;
-  screenHeight = screenWidth * 16 / 9;
+  screenHeight = screenWidth * 9 / 16;
   canvas.width  = screenWidth;
-  canvas.height = screenHeight;
+  canvas.height = screenWidth * 9 / 16;
   // regola anche lo style-height per mantenere il container corretto
   canvas.style.height = screenHeight + 'px';
 }
