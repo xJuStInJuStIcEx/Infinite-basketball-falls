@@ -28,7 +28,7 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   width: 100vw;
-  height: calc(100vw * 16 / 9);
+  height: calc(100vw * 9 / 16);
   background: var(--bg-light);
   z-index: 1;
 }
