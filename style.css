@@ -1,4 +1,17 @@
-/* Impostazioni base: corpo a pieno schermo, nessun margine */
+/* Variables */
+:root {
+  --bg-light: #f0f0f0;
+  --overlay-bg: rgba(0, 0, 0, 0.8);
+  --text-white: #fff;
+  --btn-primary: #28a745;
+  --btn-accent: #ffc107;
+  --font-main: sans-serif;
+  --btn-size: 3em;
+  --control-dim: 60px;
+  --ratio-16-9: 56.25%; /* 9/16 × 100 */
+}
+
+/* Reset and base styles */
 html, body {
   margin: 0;
   padding: 0;
@@ -6,29 +19,43 @@ html, body {
   height: 100%;
   overflow: hidden;
   touch-action: none;
-  font-family: sans-serif;
+  font-family: var(--font-main);
 }
 
-/* Canvas a piena dimensione, mantiene il ratio 16:9 in verticale */
+/* Canvas container for 16:9 ratio */
+.canvas-container {
+  position: relative;
+  width: 100%;
+  padding-top: var(--ratio-16-9);
+  overflow: hidden;
+}
+
+/* Game canvas */
 #gameCanvas {
   position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100vw;
-  height: calc(100vw * 16 / 9);
-  background: #f0f0f0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-light);
 }
 
-/* Overlay schermata titolo */
-.overlay {
+/* Common absolute-centered overlay, controls, HUD */
+.overlay,
+#controls,
+#hud {
   position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+/* Title-screen overlay */
+.overlay {
   top: 0;
-  left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  background: var(--overlay-bg);
+  color: var(--text-white);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -58,104 +85,90 @@ html, body {
   justify-content: center;
 }
 
-/* Emoji button – stile unificato */
-.emoji-btn {
+/* Shared styles for emoji and control buttons */
+.emoji-btn,
+.control-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  touch-action: none;
+}
+
+/* Emoji buttons */
+.emoji-btn {
   position: relative;
-  width: 3em;
-  height: 3em;
+  width: var(--btn-size);
+  height: var(--btn-size);
   font-size: 2em;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 0.5em;
   margin: 0.25em;
   padding: 0;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    box-shadow 0.2s;
   box-sizing: border-box;
 }
 
-/* Hover/focus per feedback rapido */
 .emoji-btn:hover,
 .emoji-btn:focus {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Stato selezionato */
 .emoji-btn.selected {
-  background: rgba(255, 193, 7, 0.3) !important;
-  border-color: #ffc107 !important;
-  box-shadow: 0 0 8px rgba(255, 193, 7, 0.8) !important;
+  background: rgba(255, 193, 7, 0.3);
+  border-color: var(--btn-accent);
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.8);
 }
 
-/* Spunta in alto a destra */
 .emoji-btn.selected::after {
   content: '✔️';
   position: absolute;
   top: -0.4em;
   right: -0.4em;
   font-size: 0.75em;
-  background: #fff;
+  background: var(--text-white);
   border-radius: 50%;
 }
 
-/* Bottone grande (es. start game) */
+/* Large buttons (e.g., start game) */
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
   padding: 0.5em 1em;
   border: none;
   border-radius: 0.5em;
-  background: #28a745;
-  color: #fff;
-  cursor: pointer;
+  background: var(--btn-primary);
+  color: var(--text-white);
 }
 
-/* Controlli touch in basso */
+/* Touch controls */
 #controls {
-  position: absolute;
   bottom: 5vh;
-  left: 50%;
-  transform: translateX(-50%);
   display: none;
   gap: 5vw;
-  z-index: 5;
 }
 
-/* Mostra i controlli quando il body ha classe "playing" */
 body.playing #controls {
-  display: flex !important;
+  display: flex;
 }
 
 .control-btn {
+  width: var(--control-dim);
+  height: var(--control-dim);
   font-size: 2em;
   background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: none;
+  color: var(--text-white);
 }
 
-/* HUD: tempo e punteggio */
+/* HUD (time and score) */
 #hud {
-  position: absolute;
   top: 1vh;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 2vw;
-  z-index: 5;
 }
 
 #timeBarContainer {
@@ -167,8 +180,8 @@ body.playing #controls {
 }
 
 #timeBar {
-  height: 100%;
   width: 100%;
+  height: 100%;
   background: #dc3545;
   transition: width 0.1s linear;
 }
