@@ -1,17 +1,4 @@
-/* Variables */
-:root {
-  --bg-light:     #f0f0f0;
-  --overlay-bg:   rgba(0, 0, 0, 0.8);
-  --text-white:   #fff;
-  --btn-primary:  #28a745;
-  --btn-accent:   #ffc107;
-  --font-main:    sans-serif;
-  --btn-size:     3em;
-  --control-dim:  60px;
-  --ratio-16-9:   56.25%; /* 9/16 x 100 */
-}
-
-/* Reset & base */
+/* Impostazioni base: corpo a pieno schermo, nessun margine */
 html, body {
   margin: 0;
   padding: 0;
@@ -19,36 +6,29 @@ html, body {
   height: 100%;
   overflow: hidden;
   touch-action: none;
-  font-family: var(--font-main);
+  font-family: sans-serif;
 }
 
-/* Canvas container for 16:9 ratio */
-.canvas-container {
-  position: relative;
-  width: 100vw;
-  padding-top: var(--ratio-16-9);
-  overflow: hidden;
-}
-
-/* Game canvas full inside container */
+/* Canvas a piena dimensione, mantiene il ratio 16:9 in verticale */
 #gameCanvas {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-light);
-  z-index: 1;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: calc(100vw * 16 / 9);
+  background: #f0f0f0;
 }
 
-/* Title overlay */
+/* Overlay schermata titolo */
 .overlay {
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
-  background: var(--overlay-bg);
-  color: var(--text-white);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,87 +58,95 @@ html, body {
   justify-content: center;
 }
 
-/* Emoji & control buttons */
-.emoji-btn,
-.control-btn {
+/* Emoji button – stile unificato */
+.emoji-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-  touch-action: none;
-}
-
-/* Emoji buttons */
-.emoji-btn {
   position: relative;
-  width: var(--btn-size);
-  height: var(--btn-size);
+  width: 3em;
+  height: 3em;
   font-size: 2em;
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 0.5em;
   margin: 0.25em;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
   box-sizing: border-box;
 }
 
+/* Hover/focus per feedback rapido */
 .emoji-btn:hover,
 .emoji-btn:focus {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
+/* Stato selezionato */
 .emoji-btn.selected {
-  background: rgba(255,193,7,0.3);
-  border-color: var(--btn-accent);
-  box-shadow: 0 0 8px rgba(255,193,7,0.8);
+  background: rgba(255, 193, 7, 0.3) !important;
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.8) !important;
 }
 
+/* Spunta in alto a destra */
 .emoji-btn.selected::after {
   content: '✔️';
   position: absolute;
   top: -0.4em;
   right: -0.4em;
   font-size: 0.75em;
-  background: var(--text-white);
+  background: #fff;
   border-radius: 50%;
 }
 
-/* Start button */
+/* Bottone grande (es. start game) */
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
   padding: 0.5em 1em;
   border: none;
   border-radius: 0.5em;
-  background: var(--btn-primary);
-  color: var(--text-white);
+  background: #28a745;
+  color: #fff;
+  cursor: pointer;
 }
 
-/* Touch controls at edges */
+/* Controlli touch in basso */
 #controls {
   position: absolute;
   bottom: 5vh;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 5vw;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 5vw;
   z-index: 5;
-  pointer-events: none;
+}
+
+/* Mostra i controlli quando il body ha classe "playing" */
+body.playing #controls {
+  display: flex !important;
 }
 
 .control-btn {
-  width: var(--control-dim);
-  height: var(--control-dim);
   font-size: 2em;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
-  color: var(--text-white);
-  pointer-events: auto;
+  width: 60px;
+  height: 60px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
 }
 
-/* HUD: time bar & score */
+/* HUD: tempo e punteggio */
 #hud {
   position: absolute;
   top: 1vh;
@@ -179,8 +167,8 @@ html, body {
 }
 
 #timeBar {
-  width: 100%;
   height: 100%;
+  width: 100%;
   background: #dc3545;
   transition: width 0.1s linear;
 }
