@@ -1,4 +1,4 @@
-// main.js – Codice ottimizzato
+// main.js – Codice ottimizzato con AABB collision box
 
 // COSTANTI DI GIOCO
 const PLAYER_IMAGE_SRC  = 'Ninja.png';
@@ -8,6 +8,10 @@ const SIDE_SPEED        = 200;    // px/s
 const EFFECT_DURATIONS  = { bounceDisable: 3, slow: 10, fast: 10, magnetUses: 5 };
 const LS_BEST_SCORE     = 'bestScore';
 const LS_LAST_SCORE     = 'lastScore';
+
+// Dimensioni sprite e oggetti per collisioni
+const PLAYER_SIZE  = 64;  // px
+const ELEMENT_SIZE = 32;  // px
 
 // Tipi di elementi cadenti e probabilità
 const ELEMENT_TYPES = [
@@ -64,29 +68,25 @@ class Player {
   }
 
   update(dt) {
-    // Aggiorna timer effetti
     for (let e in this.effects) {
       if (this.effects[e] > 0) {
         this.effects[e] = Math.max(0, this.effects[e] - dt);
       }
     }
-
-    // Muovi orizzontalmente se non bloccato
     if (this.effects.bounceDisable <= 0) {
       this.x += this.vx * dt;
-      // Limita ai bordi
       this.x = Math.max(0, Math.min(screenW, this.x));
     }
   }
 
   draw(ctx) {
-    const size = 64;
     if (this.imgLoaded) {
       ctx.drawImage(
         this.img,
-        this.x - size/2,
-        this.y - size/2,
-        size, size
+        this.x - PLAYER_SIZE/2,
+        this.y - PLAYER_SIZE/2,
+        PLAYER_SIZE,
+        PLAYER_SIZE
       );
     } else {
       ctx.font = '24px sans-serif';
@@ -135,7 +135,7 @@ function init() {
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
-  // Carica punteggi da LocalStorage
+  // Carica punteggi
   bestScore = parseInt(localStorage.getItem(LS_BEST_SCORE)) || 0;
   lastScore = parseInt(localStorage.getItem(LS_LAST_SCORE)) || 0;
   document.getElementById('bestScore').textContent = bestScore;
@@ -148,7 +148,7 @@ function init() {
     startGame();
   });
 
-  // Setup controlli (pointer per mouse e touch)
+  // Setup controlli (pointer)
   leftBtn.addEventListener('pointerdown', () => {
     if (player.effects.bounceDisable <= 0) player.vx = -SIDE_SPEED;
   });
@@ -164,7 +164,7 @@ function init() {
   requestAnimationFrame(loop);
 }
 
-// Adatta canvas alla dimensione del container
+// Adatta canvas al container 16:9
 function resizeCanvas() {
   screenW = canvas.parentElement.offsetWidth;
   screenH = canvas.parentElement.offsetHeight;
@@ -211,29 +211,22 @@ function loop(ts) {
 
 // Aggiorna stato di gioco
 function update(dt) {
-  // Timer
   timeLeft -= dt;
   if (timeLeft <= 0) {
     endGame();
     return;
   }
 
-  // Spawn casuale
   if (Math.random() < 1.2 * dt) spawnRandomElement();
 
-  // Aggiorna elementi e li filtra quando fuori schermo
   elements = elements.filter(el => {
     el.update(dt);
-    return el.y + 32 > 0;
+    return el.y + ELEMENT_SIZE > 0;
   });
 
-  // Effetto calamita
   if (player.magnetUses > 0) applyMagnet();
-
-  // Aggiorna giocatore
   player.update(dt);
 
-  // Collisioni
   elements.forEach(el => {
     if (isColliding(player, el)) handleCollision(el);
   });
@@ -243,20 +236,17 @@ function update(dt) {
 function render() {
   ctx.clearRect(0, 0, screenW, screenH);
 
-  // Giocatore
   player.draw(ctx);
 
-  // Elementi cadenti
   ctx.font = '32px sans-serif';
   elements.forEach(el => el.draw(ctx));
 
-  // HUD
-  timeBar.style.width = `${(timeLeft / GAME_DURATION) * 100}%`;
-  timeText.textContent  = Math.ceil(timeLeft);
-  scoreText.textContent = score;
+  timeBar.style.width    = `${(timeLeft / GAME_DURATION) * 100}%`;
+  timeText.textContent   = Math.ceil(timeLeft);
+  scoreText.textContent  = score;
 }
 
-// Crea un nuovo elemento in base a probabilità
+// Genera elemento casuale
 function spawnRandomElement() {
   const r = Math.random() * spawnCumulProb.slice(-1)[0].threshold;
   const t = spawnCumulProb.find(o => r <= o.threshold);
@@ -265,7 +255,7 @@ function spawnRandomElement() {
       t.type,
       t.icon,
       Math.random() * screenW,
-      screenH + 32
+      screenH + ELEMENT_SIZE
     )
   );
 }
@@ -298,7 +288,7 @@ function handleCollision(el) {
   elements = elements.filter(x => x !== el);
 }
 
-// Controllo calamita: attira solo 'basket'
+// Calamita: attira solo 'basket'
 function applyMagnet() {
   elements.forEach(item => {
     if (item.type === 'basket') {
@@ -309,12 +299,28 @@ function applyMagnet() {
   player.magnetUses--;
 }
 
-// Collisioni AABB semplice
+// Collisione AABB basata su dimensioni reali
 function isColliding(p, el) {
-  return (
-    Math.abs(p.x - el.x) < 32 &&
-    Math.abs(p.y - el.y) < 32
-  );
+  const halfP = PLAYER_SIZE / 2;
+  const halfE = ELEMENT_SIZE / 2;
+
+  const pLeft   = p.x - halfP;
+  const pRight  = p.x + halfP;
+  const pTop    = p.y - halfP;
+  const pBottom = p.y + halfP;
+
+  const eLeft   = el.x - halfE;
+  const eRight  = el.x + halfE;
+  const eTop    = el.y - halfE;
+  const eBottom = el.y + halfE;
+
+  const noOverlap =
+    pRight  < eLeft  ||
+    pLeft   > eRight ||
+    pBottom < eTop   ||
+    pTop    > eBottom;
+
+  return !noOverlap;
 }
 
 // Debug log su schermo
