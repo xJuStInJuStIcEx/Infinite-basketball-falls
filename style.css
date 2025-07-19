@@ -21,19 +21,18 @@ html, body {
   font-family: var(--font-main);
 }
 
-/* Full-screen canvas */
+/* Full-screen game canvas */
 #gameCanvas {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   background: var(--bg-light);
   z-index: 1;
 }
 
-/* Title overlay */
-.overlay {
+/* Title-screen overlay */
+#titleScreen.overlay {
   position: absolute;
   top: 0; left: 0;
   width: 100vw;
@@ -46,36 +45,34 @@ html, body {
   justify-content: center;
   z-index: 10;
 }
-.overlay h1 {
+
+#titleScreen.overlay h1 {
   font-size: 3em;
   margin-bottom: 0.5em;
 }
-.scores {
+
+#titleScreen .scores {
   display: flex;
   gap: 1em;
   margin-bottom: 1em;
 }
-.selector p {
+
+#titleScreen .selector p {
   margin: 0.5em 0;
 }
-#emojiChooser {
+
+#titleScreen #emojiChooser {
   display: flex;
   gap: 0.5em;
   justify-content: center;
 }
 
-/* Emoji & control buttons */
-.emoji-btn,
-.control-btn {
+/* Emoji buttons */
+.emoji-btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-  touch-action: none;
-}
-.emoji-btn {
-  position: relative;
   width: var(--btn-size);
   height: var(--btn-size);
   font-size: 2em;
@@ -84,16 +81,22 @@ html, body {
   border-radius: 0.5em;
   margin: 0.25em;
   box-sizing: border-box;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  touch-action: none;
 }
+
 .emoji-btn:hover,
 .emoji-btn:focus {
   background: rgba(255,255,255,0.2);
 }
+
 .emoji-btn.selected {
   background: rgba(255,193,7,0.3);
   border-color: var(--btn-accent);
   box-shadow: 0 0 8px rgba(255,193,7,0.8);
 }
+
 .emoji-btn.selected::after {
   content: '✔️';
   position: absolute;
@@ -104,7 +107,7 @@ html, body {
   border-radius: 50%;
 }
 
-/* Start button */
+/* “Inizia” button */
 .large-btn {
   margin-top: 1em;
   font-size: 1.5em;
@@ -113,6 +116,7 @@ html, body {
   border-radius: 0.5em;
   background: var(--btn-primary);
   color: var(--text-white);
+  cursor: pointer;
 }
 
 /* Touch controls at screen edges */
@@ -125,8 +129,9 @@ html, body {
   justify-content: space-between;
   padding: 0 5vw;
   z-index: 5;
-  pointer-events: none; /* disable clicks on container */
+  pointer-events: none; /* disable on container */
 }
+
 .control-btn {
   width: var(--control-dim);
   height: var(--control-dim);
@@ -135,10 +140,11 @@ html, body {
   border: none;
   border-radius: 50%;
   color: var(--text-white);
-  pointer-events: auto; /* enable clicks on buttons */
+  pointer-events: auto; /* re-enable on buttons */
+  cursor: pointer;
 }
 
-/* HUD: time bar & score */
+/* HUD: time-bar & score */
 #hud {
   position: absolute;
   top: 1vh;
@@ -149,6 +155,7 @@ html, body {
   gap: 2vw;
   z-index: 5;
 }
+
 #timeBarContainer {
   width: 50vw;
   height: 10px;
@@ -156,12 +163,14 @@ html, body {
   border-radius: 5px;
   overflow: hidden;
 }
+
 #timeBar {
   width: 100%;
   height: 100%;
   background: #dc3545;
   transition: width 0.1s linear;
 }
+
 #timeText,
 #scoreText {
   font-size: 1.2em;
